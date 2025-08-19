@@ -39,8 +39,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Deploying WAR locally to Tomcat webapps folder..."
-        sh 'cp project/target/spring-petclinic.war /home/ec2-user/apache-tomcat-9.0.108/webapps'
-'
+        sh '''
+          cp project/target/spring-petclinic.war /home/ec2-user/apache-tomcat-9.0.108/webapps
+         '''
                 }
             }
         }
