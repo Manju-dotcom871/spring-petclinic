@@ -38,12 +38,9 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo "Deploying WAR to Tomcat server..."
-                sshagent (credentials: ['tomcat-ssh-key']) {
-                    sh '''
-                        scp project/target/spring-petclinic.war jenkins@13.127.195.8:/home/ec2-user/apache-tomcat-9.0.108/webapps
-
-                    '''
+                echo "Deploying WAR locally to Tomcat webapps folder..."
+        sh 'cp project/target/spring-petclinic.war /home/ec2-user/apache-tomcat-9.0.108/webapps'
+'
                 }
             }
         }
