@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Cloning the repository..."
+                sh '''
+                    rm -rf project
+                    git clone -b main https://github.com/Manju-dotcom871/spring-petclinic.git project
+                '''
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building project using Maven..."
+                sh '''
+                    cd project
+                    mvn clean package -DskipTests
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Checking if WAR file exists..."
+                sh '''
+                    if [ -f "project/target/spring-petclinic.war" ]; then
+                        echo "WAR file exists."
+                    else
+                        echo "WAR file not found!"
+                        exit 1
+                    fi
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying WAR to Tomcat server..."
+                sshagent (credentials: ['tomcat-ssh-key']) {
+                    sh '''
+                        scp project/target/spring-petclinic.war jenkins@13.127.195.8:/home/ec2-user/apache-tomcat-9.0.108/webapps
+
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Deployment successful!'
+        }
+        failure {
+            echo '❌ Deployment failed.'
+        }
+    }
+}
